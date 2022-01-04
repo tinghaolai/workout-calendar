@@ -8,21 +8,58 @@
 </style>
 <body>
 <div id="app">
+    <el-row>
+        <el-col :span="12" :offset="6">
+            <h3>Training Cycles</h3>
+            <el-form :model="form" label-width="200px">
+                <el-form-item label="Functions">
+                    <el-button type="primary" @click="addCycle">Add cycle</el-button>
+                </el-form-item>
+                <template v-for="(cycle, index) in form.cycles">
+                    <el-form-item>
+                        <div slot="label">
+                            <h3>{{ 'Cycle ' + (index + 1) }}</h3>
+                        </div>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-form>
+                            <el-form-item label="Type">
+                                <el-select v-model="cycle.type">
+                                    <el-option value="train" label="training day"></el-option>
+                                    <el-option value="off" label="off day"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-form>
+                    </el-form-item>
+                </template>
+            </el-form>
+        </el-col>
+    </el-row>
 </div>
 <script src="plugins/vue.js"></script>
 <script src="plugins/element.min.js"></script>
 <script src="plugins/moment.min.js"></script>
 <script src="plugins/axios.min.js"></script>
 <script type="text/javascript">
+    class Cycle {
+        constructor() {
+            this.type = null;
+        }
+    }
 
     new Vue({
         el: '#app',
         data() {
             return {
-
+                form: {
+                    cycles: [new Cycle()],
+                },
             };
         },
         methods: {
+            addCycle() {
+                this.form.cycles.push(new Cycle());
+            }
         },
     })
 </script>
