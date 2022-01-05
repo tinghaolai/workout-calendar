@@ -18,7 +18,7 @@
                 <template v-for="(cycle, index) in form.cycles">
                     <el-form-item>
                         <div slot="label">
-                            <h3>{{ 'Cycle ' + (index + 1) }}</h3>
+                            <div>{{ 'Cycle ' + (index + 1) }}</div>
                         </div>
                     </el-form-item>
                     <el-form-item>
@@ -41,26 +41,57 @@
 <script src="plugins/moment.min.js"></script>
 <script src="plugins/axios.min.js"></script>
 <script type="text/javascript">
+    class Workout {
+        constructor() {
+            this.type = null;
+        }
+    }
+
     class Cycle {
         constructor() {
             this.type = null;
         }
     }
 
+    function getVueWatch() {
+        let watchObject = {};
+        Object.keys(form).forEach(key => {
+            watchObject['form.' + key] = function () {
+                localStorage.setItem('form', JSON.stringify(this.form));
+            }
+        });
+
+        return watchObject;
+    }
+
+    let form = {
+        cycles: [new Cycle()],
+    };
+
     new Vue({
         el: '#app',
         data() {
+            let storageForm = JSON.parse(localStorage.getItem('form'));
+
             return {
-                form: {
-                    cycles: [new Cycle()],
-                },
+                form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
             };
         },
         methods: {
+            fixEmptyFormProperty(storageForm, originForm) {
+                Object.keys(originForm).forEach(originKey => {
+                    if (storageForm[originKey] === undefined) {
+                        storageForm[originKey] = originForm[originKey];
+                    }
+                });
+
+                return storageForm;
+            },
             addCycle() {
                 this.form.cycles.push(new Cycle());
             }
         },
+        watch: getVueWatch(),
     })
 </script>
 </body>
