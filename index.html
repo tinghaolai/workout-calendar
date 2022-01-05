@@ -53,17 +53,6 @@
         }
     }
 
-    function getVueWatch() {
-        let watchObject = {};
-        Object.keys(form).forEach(key => {
-            watchObject['form.' + key] = function () {
-                localStorage.setItem('form', JSON.stringify(this.form));
-            }
-        });
-
-        return watchObject;
-    }
-
     let form = {
         cycles: [new Cycle()],
     };
@@ -91,7 +80,14 @@
                 this.form.cycles.push(new Cycle());
             }
         },
-        watch: getVueWatch(),
+        watch: {
+            form: {
+                handler() {
+                    localStorage.setItem('form', JSON.stringify(this.form));
+                },
+                deep: true,
+            },
+        },
     })
 </script>
 </body>
