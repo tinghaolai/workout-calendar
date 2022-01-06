@@ -37,7 +37,7 @@
                                 <el-button type="primary" @click="addWorkOut(cycle)" :disabled="cycle.type !== 'train'">Add workouts</el-button>
                                 <div v-for="(workout, index) in cycle.workouts">
                                     <el-form-item label="workout type">
-                                        <el-select v-model="workout.type">
+                                        <el-select v-model="workout.type" filterable>
                                             <el-option label="swim" value="swim"></el-option>
                                             <el-option label="jump bed" value="jump bed"></el-option>
                                             <el-option label="abs" value="abs"></el-option>
