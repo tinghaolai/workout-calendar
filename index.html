@@ -8,9 +8,28 @@
     body {
         background-color: #E4E7ED;
     }
+
+    .vc-day.is-not-in-month div {
+        opacity: 0.5 !important;
+    }
 </style>
 <body>
 <div id="app">
+    <el-row>
+        <h2 style="text-align: center">Workout calendar</h2>
+        <v-date-picker v-model="calendarDate"
+                       show-weeknumbers="left-outside"
+                       :attributes='calendarAttributes'
+                       is-dark
+                       is-expanded
+                       is-range>
+            <template v-slot:day-content="{ day, attributes }">
+                <div style="text-align: center">
+                    {{ day.day }}
+                </div>
+            </template>
+        </v-date-picker>
+    </el-row>
     <el-row>
         <el-col :span="12" :offset="6">
             <h3>Training Cycles</h3>
@@ -70,7 +89,14 @@
 <script src="plugins/element.min.js"></script>
 <script src="plugins/moment.min.js"></script>
 <script src="plugins/axios.min.js"></script>
+<script src="plugins/v-calendar.umd.min.js"></script>
 <script type="text/javascript">
+    Date.prototype.addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    };
+
     class Workout {
         constructor() {
             this.type = null;
@@ -95,6 +121,9 @@
 
             return {
                 form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
+                calendarDate: null,
+                calendarAttributes: [
+                ],
             };
         },
         methods: {
