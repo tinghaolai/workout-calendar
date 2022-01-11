@@ -24,9 +24,9 @@
                        is-expanded
                        is-range>
             <template v-slot:day-content="{ day, attributes }">
-                <div style="text-align: center">
-                    {{ day.day }}
-                </div>
+                <template v-for="info in convertDataInfo(day)">
+                    <div>{{ info.cycleIndex }} {{ info.day }}</div>
+                </template>
             </template>
         </v-date-picker>
     </el-row>
@@ -151,6 +151,16 @@
             deleteCycle(cycleIndex) {
                 this.form.cycles.splice(cycleIndex, 1);
             },
+            convertDataInfo(day) {
+                let cycleIndex = moment(day.date).dayOfYear() % this.form.cycles.length + 1;
+
+                return {
+                    info: {
+                        cycleIndex: cycleIndex,
+                        day: day.day
+                    }
+                }
+            }
         },
         watch: {
             form: {
