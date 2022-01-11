@@ -40,7 +40,7 @@
                 <template v-for="(cycle, index) in form.cycles">
                     <el-form-item>
                         <div slot="label">
-                            <div>{{ 'Cycle ' + (index + 1) }}</div>
+                            <div>{{ 'Cycle ' + index }}</div>
                         </div>
                         <el-button type="danger" @click="deleteCycle(index)">Delete</el-button>
                     </el-form-item>
