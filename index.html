@@ -117,7 +117,7 @@
     new Vue({
         el: '#app',
         data() {
-            let storageForm = JSON.parse(localStorage.getItem('form'));
+            let storageForm = JSON.parse(localStorage.getItem('workout-calendar-form'));
 
             return {
                 form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
@@ -165,7 +165,7 @@
         watch: {
             form: {
                 handler() {
-                    localStorage.setItem('form', JSON.stringify(this.form));
+                    localStorage.setItem('workout-calendar-form', JSON.stringify(this.form));
                 },
                 deep: true,
             },
