@@ -12,6 +12,18 @@
     .vc-day.is-not-in-month div {
         opacity: 0.5 !important;
     }
+
+    .calendarCard {
+        padding: 5px;
+    }
+
+    .dayInfo {
+        border: 2px solid #E6A23C;
+        background-color: #E6A23C;
+        color: white;
+        border-radius: 5px;
+        padding: 2px;
+    }
 </style>
 <body>
 <div id="app">
@@ -25,7 +37,17 @@
                        is-range>
             <template v-slot:day-content="{ day, attributes }">
                 <template v-for="info in convertDataInfo(day)">
-                    <div>{{ info.cycleIndex }} {{ info.day }}</div>
+                    <div class="calendarCard">
+                        <el-card class="box-card" :style="(info.isToday) ? 'background-color: #409EFF' : ''">
+                            <div slot="header" class="clearfix">
+                                <span class="dayInfo">{{ info.day }}</span>
+                                <span>| {{ info.type }}</span>
+                            </div>
+                            <div v-for="(workout, index) in info.workouts" :key="index" class="text item">
+                                {{ workout.type }}
+                            </div>
+                        </el-card>
+                    </div>
                 </template>
             </template>
         </v-date-picker>
@@ -152,12 +174,16 @@
                 this.form.cycles.splice(cycleIndex, 1);
             },
             convertDataInfo(day) {
-                let cycleIndex = moment(day.date).dayOfYear() % this.form.cycles.length + 1;
+                let cycleIndex = moment(day.date).dayOfYear() % this.form.cycles.length;
+                let cycle = this.form.cycles[cycleIndex];
 
                 return {
                     info: {
                         cycleIndex: cycleIndex,
-                        day: day.day
+                        day: day.day,
+                        isToday: day.isToday,
+                        type: cycle.type,
+                        workouts: cycle.workouts,
                     }
                 }
             }
