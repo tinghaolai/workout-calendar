@@ -100,6 +100,7 @@
                                             <el-option label="boxing" value=boxing""></el-option>
                                             <el-option label="table tennis" value="tableTennis"></el-option>
                                         </el-select>
+                                        <el-button type="danger" @click="deleteWorkout(cycle.workouts, workoutIndex)">Delete</el-button>
                                     </el-form-item>
                                 </div>
                             </el-form-item>
@@ -176,6 +177,9 @@
             },
             deleteCycle(cycleIndex) {
                 this.form.cycles.splice(cycleIndex, 1);
+            },
+            deleteWorkout(workouts, workoutIndex) {
+                workouts.splice(workoutIndex, 1);
             },
             convertDataInfo(day) {
                 let cycleIndex = (this.form.offSet + moment(day.date).dayOfYear()) % this.form.cycles.length;
