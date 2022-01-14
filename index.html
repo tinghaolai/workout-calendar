@@ -79,9 +79,9 @@
                             </el-form-item>
                             <el-form-item label="Workouts">
                                 <el-button type="primary" @click="addWorkOut(cycle)" :disabled="cycle.type !== 'train'">Add workouts</el-button>
-                                <div v-for="(workout, index) in cycle.workouts">
+                                <div v-for="(workout, workoutIndex) in cycle.workouts">
                                     <el-form-item label="workout type">
-                                        <el-select v-model="workout.type" filterable>
+                                        <el-select v-model="workout.type" filterable @change="workout.options = workoutTypeChanged(workout)">
                                             <el-option label="swim" value="swim"></el-option>
                                             <el-option label="jump bed" value="jumpBed"></el-option>
                                             <el-option label="abs" value="abs"></el-option>
@@ -101,6 +101,34 @@
                                             <el-option label="table tennis" value="tableTennis"></el-option>
                                         </el-select>
                                         <el-button type="danger" @click="deleteWorkout(cycle.workouts, workoutIndex)">Delete</el-button>
+                                        <template v-for="(value, optionType) in workout.options">
+                                            <el-form-item label="count" v-if="optionType === 'count'">
+                                                <el-input v-model="workout.count" type="number"></el-input>
+                                            </el-form-item>
+
+                                            <el-form-item label="time" v-else-if="optionType === 'time'">
+                                                <el-input v-model="workout.time" type="number">
+                                                    <template slot="append">mins</template>
+                                                </el-input>
+                                            </el-form-item>
+
+                                            <template v-else-if="optionType === 'kgCount'">
+                                                <el-form-item label="kg-count set">
+                                                    <el-button type="primary" @click="addKgCount(workout)">Add</el-button>
+                                                    <template v-for="(kgCount, kgCountIndex) in workout.kgCounts">
+                                                        <el-form-item label="kg/count">
+                                                            <el-button type="danger" @click="deleteKgCount(workout.kgCounts, kgCountIndex)">Delete</el-button>
+                                                        </el-form-item>
+                                                        <el-form-item label="kg">
+                                                            <el-input v-model="kgCount.kg" type="number"></el-input>
+                                                        </el-form-item>
+                                                        <el-form-item label="count">
+                                                            <el-input v-model="kgCount.count" type="number"></el-input>
+                                                        </el-form-item>
+                                                    </template>
+                                                </el-form-item>
+                                            </template>
+                                        </template>
                                     </el-form-item>
                                 </div>
                             </el-form-item>
@@ -126,6 +154,7 @@
     class Workout {
         constructor() {
             this.type = null;
+            this.options = {};
         }
     }
 
@@ -133,6 +162,13 @@
         constructor() {
             this.type = null;
             this.workouts = [];
+        }
+    }
+
+    class KgCount {
+        constructor() {
+            this.kg = null;
+            this.count = null;
         }
     }
 
@@ -181,6 +217,9 @@
             deleteWorkout(workouts, workoutIndex) {
                 workouts.splice(workoutIndex, 1);
             },
+            deleteKgCount(kgCounts, kgCountIndex) {
+                kgCounts.splice(kgCountIndex, 1);
+            },
             convertDataInfo(day) {
                 let cycleIndex = (this.form.offSet + moment(day.date).dayOfYear()) % this.form.cycles.length;
                 let cycle = this.form.cycles[cycleIndex];
@@ -197,6 +236,55 @@
             },
             addOffset() {
                 this.form.offSet++;
+            },
+            workoutTypeChanged(workout) {
+                delete workout.count;
+                delete workout.time;
+                delete workout.kgCounts;
+
+                let options = {};
+
+                switch (workout.type) {
+                    case 'abs':
+                    case 'parkBar':
+                    case 'pushUp':
+                        options.count = true;
+                        break;
+                }
+
+                switch (workout.type) {
+                    case 'jumpBed':
+                    case 'abs':
+                    case 'parkBar':
+                    case 'jogging':
+                    case 'boxing':
+                        options.time = true;
+                        break;
+                }
+
+                switch (workout.type) {
+                    case 'chest':
+                    case 'triceps':
+                    case 'bicep':
+                    case 'trapezius':
+                    case 'back':
+                    case 'shoulder':
+                    case 'leg':
+                    case 'forearm':
+                    case 'grip':
+                        options.kgCount = true;
+                        workout.kgCounts = [new KgCount()];
+                        break;
+                }
+
+                return options;
+            },
+            addKgCount(workout) {
+                if (!workout.kgCounts) {
+                    workout.kgCounts = [];
+                }
+
+                workout.kgCounts.push(new KgCount());
             },
         },
         watch: {
