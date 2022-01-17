@@ -24,6 +24,14 @@
         border-radius: 5px;
         padding: 2px;
     }
+
+    .plusBtn {
+        border: 1px solid #909399;
+        background-color: #909399;
+        color: white;
+        border-radius: 5px;
+        padding: 1px;
+    }
 </style>
 <body>
 <div id="app">
@@ -42,9 +50,21 @@
                             <div slot="header" class="clearfix">
                                 <span class="dayInfo">{{ info.day }}</span>
                                 <span>| {{ info.type }}</span>
+                                <span>| c{{ info.cycleIndex }}</span>
                             </div>
-                            <div v-for="(workout, index) in info.workouts" :key="index" class="text item">
+                            <div v-for="(workout, index) in info.workouts" :key="index" class="text item" v-if="workout.type">
                                 {{ workout.type }}
+                                <button class="plusBtn" @click="changeDisplayInfo(workout, info.day)">
+                                    {{ (workout.displayInfoDays && workout.displayInfoDays[info.day]) ? '-' : '+' }}
+                                </button>
+                                <div v-if="workout.displayInfoDays && workout.displayInfoDays[info.day]">
+                                    <div v-if="workout.count">count: {{ workout.count }}</div>
+                                    <div v-if="workout.time">time: {{ workout.time }}</div>
+                                    <template v-if="workout.kgCounts && workout.kgCounts.length"
+                                              v-for="kgCount in workout.kgCounts">
+                                        <div>{{ kgCount.kg }} kg - {{ kgCount.count }}</div>
+                                    </template>
+                                </div>
                             </div>
                         </el-card>
                     </div>
@@ -285,6 +305,13 @@
                 }
 
                 workout.kgCounts.push(new KgCount());
+            },
+            changeDisplayInfo(workout, day) {
+                if (!workout.displayInfoDays) {
+                    this.$set(workout, 'displayInfoDays', {});
+                }
+
+                this.$set(workout.displayInfoDays, day, !workout.displayInfoDays[day]);
             },
         },
         watch: {
