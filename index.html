@@ -25,6 +25,22 @@
         padding: 2px;
     }
 
+    .finish {
+        border: 2px solid #67C23A;
+        background-color: #67C23A;
+        color: white;
+        border-radius: 5px;
+        padding: 2px;
+    }
+
+    .finished {
+        border: 2px solid #909399;
+        background-color: #909399;
+        color: white;
+        border-radius: 5px;
+        padding: 2px;
+    }
+
     .plusBtn {
         border: 1px solid #909399;
         background-color: #909399;
@@ -51,6 +67,11 @@
                                 <span class="dayInfo">{{ info.day }}</span>
                                 <span>| {{ info.type }}</span>
                                 <span>| c{{ info.cycleIndex }}</span>
+                                <template v-if="info.type !== 'off'">
+                                    |
+                                    <button class="finish" @click="finishDayWorkout(info)" v-if="!info.finished">Finish</button>
+                                    <button class="finished" v-else disabled>Finished</button>
+                                </template>
                             </div>
                             <div v-for="(workout, index) in info.workouts" :key="index" class="text item" v-if="workout.type">
                                 {{ workout.type }}
@@ -201,8 +222,10 @@
         el: '#app',
         data() {
             let storageForm = JSON.parse(localStorage.getItem('workout-calendar-form'));
+            let storageRecords = JSON.parse(localStorage.getItem('workout-calendar-records'));
 
             return {
+                records: (storageRecords) ? storageRecords : {},
                 form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
                 calendarDate: null,
                 calendarAttributes: [
@@ -243,14 +266,17 @@
             convertDataInfo(day) {
                 let cycleIndex = (this.form.offSet + moment(day.date).dayOfYear()) % this.form.cycles.length;
                 let cycle = this.form.cycles[cycleIndex];
+                let formatDate = moment(day.date).format('YYYY-MM-DD');
 
                 return {
                     info: {
                         cycleIndex: cycleIndex,
                         day: day.day,
+                        date: formatDate,
                         isToday: day.isToday,
                         type: cycle.type,
                         workouts: cycle.workouts,
+                        finished: this.records[formatDate] !== undefined,
                     }
                 }
             },
@@ -313,11 +339,20 @@
 
                 this.$set(workout.displayInfoDays, day, !workout.displayInfoDays[day]);
             },
+            finishDayWorkout(info) {
+                this.$set(this.records, info.date, info);
+            },
         },
         watch: {
             form: {
                 handler() {
                     localStorage.setItem('workout-calendar-form', JSON.stringify(this.form));
+                },
+                deep: true,
+            },
+            records: {
+                handler() {
+                    localStorage.setItem('workout-calendar-records', JSON.stringify(this.records));
                 },
                 deep: true,
             },
