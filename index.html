@@ -95,6 +95,18 @@
     </el-row>
     <el-row>
         <el-col :span="12" :offset="6">
+            <h3>Form storage</h3>
+            <el-button @click="displayFormStore = true;" type="primary">Store form</el-button>
+            <el-form>
+                <el-form-item v-for="(form, formName) in formStorage" :label="formName">
+                    <el-button @click="applyFormStorage(formName)" type="success">Apply</el-button>
+                    <el-button @click="deleteFormStorage(formName)" type="danger">Delete</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="12" :offset="6">
             <h3>Functions</h3>
             <div>
                 <el-button type="primary" @click="displayExport = true;">Export</el-button>
@@ -218,6 +230,12 @@
         <el-input v-model="importJson"></el-input>
         <el-button type="success" @click="applyImport">Apply</el-button>
     </el-dialog>
+    <el-dialog title="Store form"
+               :visible.sync="displayFormStore"
+               width="30%">
+        <el-input v-model="formStorageName"></el-input>
+        <el-button type="success" @click="storeForm">Store</el-button>
+    </el-dialog>
 </div>
 <script src="plugins/vue.js"></script>
 <script src="plugins/element.min.js"></script>
@@ -262,8 +280,12 @@
         data() {
             let storageForm = JSON.parse(localStorage.getItem('workout-calendar-form'));
             let storageRecords = JSON.parse(localStorage.getItem('workout-calendar-records'));
+            let formStorage = JSON.parse(localStorage.getItem('workout-calendar-form-storage'));
 
             return {
+                displayFormStore: false,
+                formStorageName: '',
+                formStorage: (formStorage) ? formStorage : {},
                 displayExport: false,
                 displayImport: false,
                 importJson: null,
@@ -389,6 +411,19 @@
             applyImport() {
                 this.form = JSON.parse(this.importJson);
             },
+            storeForm() {
+                this.$set(this.formStorage, this.formStorageName, JSON.stringify(this.form));
+                this.formStorageName = '';
+                this.displayFormStore = false;
+            },
+            applyFormStorage(formName) {
+                this.form = JSON.parse(this.formStorage[formName]);
+            },
+            deleteFormStorage(formName) {
+                delete this.formStorage[formName];
+                localStorage.setItem('workout-calendar-form-storage', JSON.stringify(this.formStorage));
+                this.$forceUpdate();
+            },
         },
         watch: {
             form: {
@@ -400,6 +435,12 @@
             records: {
                 handler() {
                     localStorage.setItem('workout-calendar-records', JSON.stringify(this.records));
+                },
+                deep: true,
+            },
+            formStorage: {
+                handler() {
+                    localStorage.setItem('workout-calendar-form-storage', JSON.stringify(this.formStorage));
                 },
                 deep: true,
             },
